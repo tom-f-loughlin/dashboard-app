@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   // Todo nested routes
   { path: 'posts', component: PostsComponent },
+  { path: '*', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

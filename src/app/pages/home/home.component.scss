@@ -1,0 +1,60 @@
+// Should be in seperate mixin file
+// Width of the caret defaults to left
+@mixin arrow-left-right-caret($width, $color, $isRight) {
+    border-top: $width solid transparent;
+    border-bottom: $width solid transparent;
+    @if $isRight == "true" {
+        border-left: $width solid $color;
+        border-right: none;
+    } @else {
+        border-right: $width solid $color;
+        border-left: none;
+    }
+}
+
+.padded-border {
+    padding: 1.5rem;
+}
+.table {
+    overflow: hidden;
+}
+
+.clickable a {
+    color: black;
+
+    &:hover {
+        text-decoration: underline;
+        color: blue;
+    }
+}
+.pagination-wrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+.caret {
+    outline:0;
+    width: 0;
+    height: 0;
+    margin: 0.5rem;
+    background-color: transparent;
+    &.disabled {
+        opacity: 0.4;
+    }
+}
+.caret-right {
+    @include arrow-left-right-caret(1rem, black, "true");
+
+    &:hover {
+        cursor: pointer;
+        @include arrow-left-right-caret(1rem, blue, "true");
+    }
+}
+.caret-left {
+    @include arrow-left-right-caret(1rem, black, "");
+
+    &:hover {
+        cursor: pointer;
+        @include arrow-left-right-caret(1rem, blue, "");
+    }
+
+}
