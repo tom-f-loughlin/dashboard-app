@@ -3,9 +3,10 @@ import { MOCK_USERS } from 'src/app/pages/home/model/login.mock';
 import { MOCK_POSTS } from 'src/app/pages/posts/model/posts.mocks';
 import { Post } from 'src/app/shared/interfaces/post.interface';
 import { PaginationService } from 'src/app/services/pagination.service';
-import { map, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { map, withLatestFrom, distinctUntilChanged, take, share, shareReplay } from 'rxjs/operators';
+import { Observable, of, combineLatest } from 'rxjs';
 import { UserData } from 'src/app/shared/interfaces/user.interface';
+import { ApiService } from 'src/app/services/api.service';
 
 const PAGINATION_LIMIT = 10;
 
@@ -18,35 +19,46 @@ interface PostUser {
   [key: number]: Post[]
 }
 
+// TODO: split out into services as turning into god service
 @Injectable({
   providedIn: 'root'
 })
 export class HomeService {
-  // chunk and combine user with posts 
 
-  // temp
-  private mockUser = MOCK_USERS;
-  private mockPost = MOCK_POSTS;
   post$: Observable<Post[]>;
   homeData$: Observable<HomeData[]>;
 
-  constructor(private paginationService: PaginationService) {
-    // replace with API request
-    const chunkedArray = this.chunkArray(this.mockPost, PAGINATION_LIMIT)
+  constructor(private paginationService: PaginationService, private apiService: ApiService) {
+    // Move to user service
+
+    const userData$ = this.apiService.userService.loadUsers()
+      .pipe(
+        map(v => !!v.success ? v.data : MOCK_USERS),
+        distinctUntilChanged()
+      );
+
+    const postChunkedData$ = this.apiService.postService.loadPosts()
+      .pipe(
+        map(v => !!v.success ? v.data : MOCK_POSTS),
+        map(v => this.chunkArray(v, PAGINATION_LIMIT)),
+        distinctUntilChanged()
+      );
 
     // we will use tha pagination as the actionable stream as we don't want to do this transformation for everything instance.
-    this.homeData$ = this.paginationService.paginatedState$.pipe(
-      withLatestFrom(of(chunkedArray)),
+
+    this.homeData$ = combineLatest(this.paginationService.paginatedState$, postChunkedData$).pipe(
+      // withLatestFrom(),
       distinctUntilChanged(),
       map(([paginationState, chunkedArr]) => chunkedArr[paginationState] || []),
       // types inferred no need to define though will for readablity
       map(filteredChunk => this.groupBy<Post>(filteredChunk, 'userId')),
-      map(postGroupByUser => this.mergeUserWithPosts(postGroupByUser))
+      withLatestFrom(userData$),
+      map(([postGroupByUser, userData]) => this.mergeUserWithPosts(postGroupByUser, userData))
     );
   }
 
 
-  private mergeUserWithPosts(postGroupByUser: PostUser, users = this.mockUser): HomeData[] {
+  private mergeUserWithPosts(postGroupByUser: PostUser, users: UserData[]): HomeData[] {
     return Object.entries(postGroupByUser).reduce((acc: HomeData[], [keyStr, posts]) => {
       const userVal = this.findUserFromGroupPost(users, keyStr)
       const mergedUserPost = this.transformHomeData(posts, userVal);

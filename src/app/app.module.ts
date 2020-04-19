@@ -10,6 +10,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { NgbModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PermissionsResolver } from 'src/app/shared/resolvers/permission.resolver';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { PermissionsResolver } from 'src/app/shared/resolvers/permission.resolve
     FormsModule,
     ReactiveFormsModule,
     NgbModalModule,
+    HttpClientModule
   ],
   providers: [PermissionsResolver],
   bootstrap: [AppComponent]
