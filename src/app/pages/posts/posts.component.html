@@ -1,1 +1,49 @@
-<p>posts works!</p>
+<main class="padded-border">
+    <form [formGroup]="postForm" (ngSubmit)="savePost()">
+        <div class="form-group form-row">
+            <label for="postTitle">Title</label>
+            <input formControlName="title" type="text" class="form-control" id="postTitle">
+        </div>
+        <div class="form-group form-row">
+            <label for="postMessage">Message</label>
+            <input formControlName="message" type="text" class="form-control" id="postMessage">
+        </div>
+        <div class="form-row align-items-baseline">
+            <button *ngIf="editable" type="button" class="btn btn-outline-info" data-toggle="modal"
+                data-target="#confirmModal" (click)="confirmDelete()">
+                Delete
+            </button>
+
+
+
+            <div class="primary-btn-group">
+                <button type="submit" class="btn btn-outline-info">Save</button>
+                <button class="btn btn-outline-info">Cancel</button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<template #deleteModal>
+    <!-- Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="deletePost"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePost">Delete Post</h5>
+                    <button type="button" class="close" aria-label="Close" >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this post?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -20,8 +20,9 @@
     overflow: hidden;
 }
 
-.clickable a {
+.clickable {
     color: black;
+    cursor: pointer;
 
     &:hover {
         text-decoration: underline;

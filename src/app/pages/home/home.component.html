@@ -13,15 +13,15 @@
                         <h6 class="">{{lineItem.user.name}}</h6>
                         <p>
                             <!-- cleanup -->
-                            <a [href]="linkHandler(lineItem)" target="_blank">
+                            <a [routerLink]="[linkHandler(lineItem)]" target="_blank">
                                 {{lineItem.user.company.name}}
                             </a>
                         </p>
                     </td>
                     <td>
                         <!-- togglable by login -->
-                        <h4 class=" clickable">
-                            <a href="">
+                        <h4 [class.clickable]="writePermission$ | async">
+                            <a [routerLink]="['/posts']" [queryParams]="{ edit: lineItem.post.id}">
                                 {{lineItem.post.title}}
                             </a>
                         </h4>

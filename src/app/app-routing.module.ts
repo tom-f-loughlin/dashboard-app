@@ -14,7 +14,6 @@ const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
-    resolve: { writePermission: PermissionsResolver },
   },
   {
     path: 'login',

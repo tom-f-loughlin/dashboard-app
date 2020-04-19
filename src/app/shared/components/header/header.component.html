@@ -1,31 +1,53 @@
 <header class="justify-content-between bg-white border-bottom shadow-sm sticky-top">
     <div class="row align-items-center h-100">
-        <h3 class="col-md-3 col-sm-6">{{title$ | async}}</h3>
-        <div class="col-md-4 offset-md-5 col-sm-6" [ngSwitch]="title$ | async">
+        <ng-container *ngIf="title$ | async as headerStateVal">
 
-            <ng-container *ngSwitchCase="headerState.HOME">
-                <!-- make component -->
+            <div class="col-md-3 col-sm-6">
+                <div class="row align-items-baseline justify-content-between">
+                    <h3>
+                        {{headerStateVal}}
+                    </h3>
 
-                <div class="row align-items-baseline justify-content-around">
-                    <ng-container *ngIf="(user$ | async) as user; else noUser">
-                        <p>Welcome, {{user.name}}!</p>
-                        <button type="button" class="btn btn-outline-info">New post</button>
-                        <a type="button" class="btn btn-outline-info" href="/login">Log out</a>
-                    </ng-container>
-                    <ng-template #noUser>
-                        <p>Your are not logged in</p>
-                        <a type="button" href="/login" class="btn btn-outline-info">Log in</a>
-                    </ng-template>
+                    <a *ngIf="headerStateVal === headerState.POST_EDIT || headerStateVal === headerState.POST_NEW"
+                        [routerLink]="['/home']">
+                        Go back to Home page
+                    </a>
                 </div>
-            </ng-container>
+            </div>
 
-            <p *ngSwitchCase="headerState.POST_EDIT">
-                Is it me your looking?
-            </p>
-            <p *ngSwitchCase="headerState.POST_NEW">
-                Is it me your looking?
-            </p>
-        </div>
+            <div class="col-md-4 offset-md-5 col-sm-6" [ngSwitch]="headerStateVal">
+
+                <!-- This should be used a temporary solution and when things get more complicated its on component -->
+                <ng-container *ngSwitchCase="headerState.HOME">
+                    <div class="row align-items-baseline justify-content-around">
+                        <ng-container *ngIf="(user$ | async) as user; else noUser">
+                            <p>Welcome, {{user.name}}!</p>
+                            <a [routerLink]="['/posts']" class="btn btn-outline-info">New post</a>
+                            <button type="button" class="btn btn-outline-info" (click)="logout()">Log out</button>
+                        </ng-container>
+                        <ng-template #noUser>
+                            <p>Your are not logged in</p>
+                            <a [routerLink]="['/login']" class="btn btn-outline-info">Log in</a>
+                        </ng-template>
+                    </div>
+                </ng-container>
+
+                <!-- *ngSwitchCase="headerState.POST_EDIT || headerState.POST_NEW" not working as expected -->
+                <ng-container *ngSwitchCase="headerState.POST_EDIT">
+                    <ng-container [ngTemplateOutlet]="useName"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="headerState.POST_NEW">
+                    <ng-container [ngTemplateOutlet]="useName"></ng-container>
+                </ng-container>
+            </div>
+        </ng-container>
+
     </div>
 
 </header>
+
+<ng-template #useName>
+    <div div class="row align-items-baseline justify-content-around" *ngIf="(user$ | async) as user">
+        <p>Welcome, {{user.name}}!</p>
+    </div>
+</ng-template>

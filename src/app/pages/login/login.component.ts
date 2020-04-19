@@ -26,7 +26,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   get formControls() { return this.loginForm.controls; }
 
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
     private formBuilder: FormBuilder,
     private headerStrategyService: HeaderStrategyService,
     private authService: AuthService) {
@@ -51,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     // Alternatively could create a stream and async on the template.
     this.formChangeSubscription = this.loginForm.valueChanges.pipe(
-      filter(_ => this.loginForm.touched && this.isSubmitted),
+      filter(_ => this.isSubmitted),
     ).subscribe(_ => {
       // if this gets complicated best to debounce 
       this.isSubmitted = false;

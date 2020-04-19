@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MOCK_USERS } from 'src/app/pages/home/model/login.mock';
 import { of, Subject, BehaviorSubject, Observable, merge } from 'rxjs';
-import { map, withLatestFrom, filter, tap, startWith, shareReplay, distinctUntilChanged } from 'rxjs/operators';
+import { map, withLatestFrom, filter, shareReplay, distinctUntilChanged } from 'rxjs/operators';
 import { UserData } from 'src/app/shared/interfaces/user.interface';
 
+const STORE_IDENTIFIER = 'USER_TOKEN';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,61 +19,45 @@ export class AuthService {
   constructor() {
 
     const mockUsers$ = of(MOCK_USERS);
-    const localStoredUser$ = of(localStorage.getItem('ACCESS_TOKEN'));
+    const localStoredUser$ = of(localStorage.getItem(STORE_IDENTIFIER));
 
+    // We want to allow emissions to login but also ensure that the user is a valid one.
+    // we also don't want to store the user data fully to the localstore so we'll just store user name
     merge(this.loginSubject, localStoredUser$).pipe(
       withLatestFrom(mockUsers$),
       filter(([userInfo, users]) => users != null),
       map(([userInfo, users]) => [...users].find(user => this.localisationStr(user.username, userInfo)) || null),
-      distinctUntilChanged()
     ).subscribe(foundUser => {
       console.log({ foundUser })
+      if (foundUser) {
+        localStorage.setItem(STORE_IDENTIFIER, foundUser.username);
+      }
       this.loggedUserSubject.next(foundUser);
     });
 
     this.isLoggedIn$ = this.loggedUserSubject.asObservable().pipe(
-      map(user => user !== null),
       shareReplay(1),
+      map(user => user !== null)
     );
-    // request user data
   }
 
   login(userInfo: string) {
     this.loginSubject.next(userInfo);
-    // const mockUsers$ = of(MOCK_USERS);
-    // const hey = mockUsers$.pipe(
-    //   first(users => !users),
-    //   map(v => v.find(user => user.username = userInfo))
-    // )
-    // const foundUser = MOCK_USERS.find(v => v.username = userInfo);
-    // if (foundUser) {
-    //   localStorage.setItem('ACCESS_TOKEN', "access_token");
-    // }
   }
 
   logout() {
+    if (this.checkIsLogged) {
+      this.loggedUserSubject.next(null);
+    }
     localStorage.clear();
   }
 
-  loggedUser() {
-    return this.loggedUserSubject.getValue();
-  }
-
-  checkIsLogged(): boolean {
+  private checkIsLogged(): boolean {
     return this.loggedUserSubject.getValue() !== null;
   }
 
-  // export to utils
+  //todo: export to utils
   private localisationStr(strRef1: string, strRef2: string): boolean {
     return strRef1.localeCompare(strRef2) === 0;
-  }
-
-  private parseJsonLocal() {
-    return JSON.parse(localStorage.getItem('user'));
-  }
-
-  private isLoggedIn(): boolean {
-    return localStorage.getItem('ACCESS_TOKEN') !== null;
-
   }
 }

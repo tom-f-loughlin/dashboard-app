@@ -3,6 +3,7 @@ import { HeaderStrategyService, HeaderState } from 'src/app/services/header-stra
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserData } from 'src/app/shared/interfaces/user.interface';
+import { EventEmitter } from 'protractor';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,10 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  logout() {
+    this.auth.logout()
   }
 
 }

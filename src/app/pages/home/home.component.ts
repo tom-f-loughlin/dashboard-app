@@ -5,6 +5,8 @@ import { HomeService, HomeData } from 'src/app/services/home.service';
 import { Observable } from 'rxjs';
 import { PaginationService, PaginationCommands } from 'src/app/services/pagination.service';
 import { HeaderStrategyService, HeaderState } from 'src/app/services/header-strategy.service';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
 
 // probably better way
 const HTTPS_EXTENERAL_TRIGGER = 'http://'
@@ -16,16 +18,22 @@ const HTTPS_EXTENERAL_TRIGGER = 'http://'
 })
 export class HomeComponent implements OnInit {
 
-  data$: Observable<HomeData[]>;
-  paginationCommands = PaginationCommands;
+  readonly data$: Observable<HomeData[]>;
+  readonly paginationCommands = PaginationCommands;
+  readonly writePermission$: Observable<boolean>;
 
   // remove for component
-  constructor(private homeService: HomeService, private paginationService: PaginationService, private headerStrategyService: HeaderStrategyService) {
+  constructor(private homeService: HomeService,
+    private paginationService: PaginationService,
+    private headerStrategyService: HeaderStrategyService,
+    private auth: AuthService
+  ) {
+    this.headerStrategyService.headerStateChange(HeaderState.HOME);
+    this.data$ = this.homeService.homeData$;
+    this.writePermission$ = this.auth.isLoggedIn$;
   }
 
   ngOnInit(): void {
-    this.headerStrategyService.headerStateChange(HeaderState.HOME);
-    this.data$ = this.homeService.homeData$;
   }
 
   paginationClick(command: PaginationCommands) {
