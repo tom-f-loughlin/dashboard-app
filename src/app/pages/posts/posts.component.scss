@@ -12,3 +12,21 @@
         margin: 0 0.2rem;
     }
 }
+
+.has-error {
+    border: 1px solid red;
+}
+
+.alert-danger {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: red;
+}
+
+.modal-dialog {
+    flex-direction: column;
+}
+.close {
+    outline: none;
+}

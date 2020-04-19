@@ -2,48 +2,54 @@
     <form [formGroup]="postForm" (ngSubmit)="savePost()">
         <div class="form-group form-row">
             <label for="postTitle">Title</label>
-            <input formControlName="title" type="text" class="form-control" id="postTitle">
+            <input formControlName="title" type="text" class="form-control" id="postTitle"
+                [ngClass]="{ 'has-error': formControls.title.errors != null && !formControls.title.pristine }">
+
+            <!-- TODO wrapper component -->
+            <div class="alert-danger" *ngIf="!formControls.title.pristine">
+                <strong *ngIf="formControls.title.errors?.required">Title is required.</strong>
+                <strong *ngIf="formControls.title.errors?.maxlength">{{errorLimitFromContext('title')}}</strong>
+            </div>
         </div>
         <div class="form-group form-row">
             <label for="postMessage">Message</label>
-            <input formControlName="message" type="text" class="form-control" id="postMessage">
+            <textarea formControlName="message" type="text" class="form-control" id="postMessage"
+                [ngClass]="{ 'has-error': formControls.message.errors != null && !formControls.message.pristine }"></textarea>
+
+            <!-- TODO wrapper component -->
+            <div class="alert-danger" *ngIf="!formControls.message.pristine">
+                <strong *ngIf="formControls.message.errors?.required">Message is required.</strong>
+                <strong *ngIf="formControls.message.errors?.maxlength">{{errorLimitFromContext('message')}}</strong>
+            </div>
         </div>
+
         <div class="form-row align-items-baseline">
-            <button *ngIf="editable" type="button" class="btn btn-outline-info" data-toggle="modal"
-                data-target="#confirmModal" (click)="confirmDelete()">
+            <button *ngIf="editable" type="button" class="btn btn-outline-info" (click)="open(mymodal)">
                 Delete
             </button>
 
-
-
             <div class="primary-btn-group">
-                <button type="submit" class="btn btn-outline-info">Save</button>
-                <button class="btn btn-outline-info">Cancel</button>
+                <button type="submit" class="btn btn-outline-info"
+                    [disabled]="postForm.invalid || !postForm.dirty">Save</button>
+                <button class="btn btn-outline-info" [routerLink]="['/home']"
+                    [disabled]="!postForm.dirty && !isNotEdit">Cancel</button>
             </div>
         </div>
     </form>
 </main>
 
-<template #deleteModal>
-    <!-- Modal -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="deletePost"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deletePost">Delete Post</h5>
-                    <button type="button" class="close" aria-label="Close" >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this post?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Yes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                </div>
-            </div>
-        </div>
+<ng-template #mymodal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Delete Post</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross Click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-</template>
+    <div class="modal-body">
+        Are you sure you want to delete this post?
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Yes Click')">Yes</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('No Click')">No</button>
+    </div>
+</ng-template>

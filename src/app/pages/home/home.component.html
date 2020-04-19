@@ -1,4 +1,4 @@
-<main class="padded-border">
+<main class="padded-border" *ngIf="(data$ | async) as tableData; else loading">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -7,7 +7,7 @@
             </tr>
         </thead>
         <tbody>
-            <ng-container *ngFor="let lineItem of data$ | async">
+            <ng-container *ngFor="let lineItem of tableData">
                 <tr>
                     <td>
                         <h6 class="">{{lineItem.user.name}}</h6>
@@ -39,3 +39,20 @@
         <button class="caret-right caret" (click)="paginationClick(paginationCommands.INCREMENET)"></button>
     </div>
 </main>
+
+<ng-template #loading>
+    <div class="container text-primary loader">
+        <div class="row align-items-center justify-content-center h-100">
+            <h1>Loading Data</h1>
+            <div class="dots-wrapper">
+                <div class="spinner-grow text-primary" role="status">
+                </div>
+                <div class="spinner-grow text-primary" role="status">
+                </div>
+                <div class="spinner-grow text-primary" role="status">
+                </div>
+            </div>
+                
+        </div>
+    </div>
+</ng-template>
