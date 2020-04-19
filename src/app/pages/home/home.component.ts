@@ -1,14 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Post } from 'src/app/shared/interfaces/post.interface';
-import { MOCK_POSTS } from 'src/app/pages/posts/model/posts.mocks';
+import { Component } from '@angular/core';
 import { HomeService, HomeData } from 'src/app/services/home.service';
 import { Observable } from 'rxjs';
 import { PaginationService, PaginationCommands } from 'src/app/services/pagination.service';
 import { HeaderStrategyService, HeaderState } from 'src/app/services/header-strategy.service';
-import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-
-// probably better way
+import { PostService } from 'src/app/services/post.service';
+import { UserService } from 'src/app/services/user.service';
+// temp look into better solution
 const HTTPS_EXTENERAL_TRIGGER = 'http://'
 
 @Component({
@@ -16,30 +14,32 @@ const HTTPS_EXTENERAL_TRIGGER = 'http://'
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
 
   readonly data$: Observable<HomeData[]>;
   readonly paginationCommands = PaginationCommands;
-  readonly writePermission$: Observable<boolean>;
+  readonly isLoggedIn$: Observable<boolean>;
+  readonly nextDisabled$: Observable<boolean>;
+  readonly previousDisabled$: Observable<boolean>;
 
-  // remove for component
-  constructor(private homeService: HomeService,
+  constructor(
+    private homeService: HomeService,
     private paginationService: PaginationService,
     private headerStrategyService: HeaderStrategyService,
-    private auth: AuthService
+    private auth: AuthService, 
+    private postService: PostService,
+    private userService: UserService
   ) {
     this.headerStrategyService.headerStateChange(HeaderState.HOME);
     this.data$ = this.homeService.homeData$;
-    this.writePermission$ = this.auth.isLoggedIn$;
-  }
-
-  ngOnInit(): void {
+    this.nextDisabled$ = this.homeService.nextDisabled$;
+    this.previousDisabled$ = this.homeService.previousDisabled$;
+    this.isLoggedIn$ = this.auth.isLoggedIn$;
   }
 
   paginationClick(command: PaginationCommands) {
     this.paginationService.paginatedChange(command)
   }
-
 
   linkHandler(lineItem: HomeData): string {
     return `${HTTPS_EXTENERAL_TRIGGER}${lineItem.user.website}`;

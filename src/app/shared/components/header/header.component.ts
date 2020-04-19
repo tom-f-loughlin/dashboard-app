@@ -3,8 +3,6 @@ import { HeaderStrategyService, HeaderState } from 'src/app/services/header-stra
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserData } from 'src/app/shared/interfaces/user.interface';
-import { EventEmitter } from 'protractor';
-
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',

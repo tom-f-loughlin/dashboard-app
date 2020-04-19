@@ -19,12 +19,22 @@
                         </p>
                     </td>
                     <td>
-                        <!-- togglable by login -->
-                        <h4 [class.clickable]="writePermission$ | async">
-                            <a [routerLink]="['/posts']" [queryParams]="{ edit: lineItem.post.id}">
+
+                        <!-- TODO: improve logic -->
+                        <ng-container *ngIf="(isLoggedIn$ | async) as isLoggedIn; else normalTitle">
+                            <h4 [class.clickable]="isLoggedIn">
+                                <a [routerLink]="['/posts']" [queryParams]="{ edit: lineItem.post.id}">
+                                    {{lineItem.post.title}}
+                                </a>
+                            </h4>
+                        </ng-container>
+                        <ng-template #normalTitle>
+                            <h4>
                                 {{lineItem.post.title}}
-                            </a>
-                        </h4>
+                            </h4>
+                        </ng-template>
+
+
                         <p>{{lineItem.post.body}}</p>
                     </td>
 
@@ -35,8 +45,11 @@
 
 
     <div class="pagination-wrapper">
-        <button class="caret-left caret" (click)="paginationClick(paginationCommands.DECREMENT)"></button>
-        <button class="caret-right caret" (click)="paginationClick(paginationCommands.INCREMENET)"></button>
+        <!-- clean up -->
+        <button class="caret-left caret" [class.hoverable]="!(previousDisabled$ | async)" [disabled]="previousDisabled$ | async"
+            (click)="paginationClick(paginationCommands.DECREMENT)"></button>
+        <button class="caret-right caret" [class.hoverable]="!(nextDisabled$ | async)" [disabled]="nextDisabled$ | async"
+            (click)="paginationClick(paginationCommands.INCREMENET)"></button>
     </div>
 </main>
 
@@ -52,7 +65,7 @@
                 <div class="spinner-grow text-primary" role="status">
                 </div>
             </div>
-                
+
         </div>
     </div>
 </ng-template>

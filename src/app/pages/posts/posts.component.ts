@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
 import { HeaderStrategyService, HeaderState } from 'src/app/services/header-strategy.service';
-import { ActivatedRoute } from '@angular/router';
-import { MOCK_POSTS } from 'src/app/pages/posts/model/posts.mocks';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Post } from 'src/app/shared/interfaces/post.interface';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
-import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { PostService } from 'src/app/services/post.service';
+import { Subscription, Subject } from 'rxjs';
+import { sample, filter } from 'rxjs/operators';
 
 interface PostForm {
   title: string;
@@ -22,49 +24,48 @@ const FORM_LIMITS = {
   TITLE: 200,
   MESSAGE: 2000
 }
+const DEFAULT_MODAL_OPT: NgbModalOptions = {
+  backdrop: 'static',
+  backdropClass: 'customBackdrop'
+}
 
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss']
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent implements OnInit, OnDestroy {
+  @ViewChild('deletePostModal') modal: TemplateRef<any>;
 
   postForm: FormGroup;
-  closeResult: string;
-  // modalRef: BsModalRef;x
   readonly editable: boolean;
-  private postState: HeaderState;
-  private mockPost = MOCK_POSTS;
   private editPostState: Post;
-
-  modalOptions:NgbModalOptions;
+  private redirectSubscription: Subscription;
+  private redirectActionSubject: Subject<void> = new Subject();
 
   get formControls() { return this.postForm.controls; }
 
-  get isNotEdit(): boolean {
-    return this.postState != HeaderState.POST_EDIT;
-  }
-
   constructor(
     private headerStrategyService: HeaderStrategyService,
-    private route: ActivatedRoute,
+    private activeRoute: ActivatedRoute,
+    private router: Router,
     private formBuilder: FormBuilder,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private postService: PostService
   ) {
     // Data resolver with posts service will will maitain and handles posts
-    const editQuery = this.route.snapshot.queryParamMap.get('edit');
-    const postId = parseInt(editQuery);
-    this.editPostState = this.mockPost.find(post => post.id === postId);
+    this.editPostState = this.activeRoute.snapshot.data.postItem;
+    this.editable = this.editPostState != null;
+    const postState = this.editable ? HeaderState.POST_EDIT : HeaderState.POST_NEW;
+    this.headerStrategyService.headerStateChange(postState);
 
-
-    this.editable = editQuery != null;
-    this.postState = editQuery ? HeaderState.POST_EDIT : HeaderState.POST_NEW;
-    this.headerStrategyService.headerStateChange(this.postState);
-    this.modalOptions = {
-      backdrop:'static',
-      backdropClass:'customBackdrop'
-    }
+    // Look to abstract to redirection service
+    this.redirectSubscription = this.postService.postData$.pipe(
+      sample(this.redirectActionSubject),
+      filter(postData => postData != null)
+    ).subscribe(_ => {
+      this.router.navigateByUrl('/home');
+    });
   }
 
   ngOnInit(): void {
@@ -76,32 +77,31 @@ export class PostsComponent implements OnInit {
     console.log(this.postForm)
   }
 
-  open(content) {
-    this.modalService.open(content, this.modalOptions).result.then((result) => {
-      alert(result)
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  ngOnDestroy(): void {
+    this.redirectSubscription.unsubscribe();
+  }
+
+  openRemoveConfirmModal() {
+    this.modalService.open(this.modal, DEFAULT_MODAL_OPT).result.then((result) => {
+      this.deletePost();
+      this.redirectActionSubject.next();
+    }, (dismissedReasoning) => {
+      // We don't need to handle dismissed as it'll just show the current state/page
     });
   }
- 
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  `with: ${reason}`;
-    }
+  private deletePost() {
+    const newState = this.mergeFormStateWithPost(this.postForm.value);
+    this.postService.deletePost(newState);
   }
 
   savePost() {
-    // if (this.postForm.invalid) {
-    //   return;
-    // }
-    // this.authService.login(this.loginForm.value.userName);
-    // this.redirectActionSubject.next();
-
+    if (this.postForm.invalid) {
+      return;
+    }
+    const newState = this.mergeFormStateWithPost(this.postForm.value);
+    this.postService.savePost(newState, this.editable);
+    this.redirectActionSubject.next();
+    // todo alert for home service
   }
 
   errorLimitFromContext(context: ErrorTypeLimits): string {
@@ -114,6 +114,11 @@ export class PostsComponent implements OnInit {
     })();
 
     return `The ${context} cannot exceed more than ${limit} characters!`;
+  }
+
+  private mergeFormStateWithPost(form: PostForm): Post {
+    const { message, title } = form;
+    return { ...this.editPostState, title, body: message };
   }
 
   private handleFormState(): PostForm {

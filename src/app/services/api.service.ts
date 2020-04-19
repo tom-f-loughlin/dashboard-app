@@ -19,7 +19,6 @@ export interface IResponseEnvelope<T> {
   data?: T;
 }
 
-// 
 export function wrapInEnvelope<T>() {
   return (response: Observable<T>): Observable<IResponseEnvelope<T>> => response.pipe(
     map(data => ({ success: true, data })),

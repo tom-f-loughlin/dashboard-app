@@ -9,7 +9,7 @@ import { PostsComponent } from './pages/posts/posts.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { NgbModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PermissionsResolver } from 'src/app/shared/resolvers/permission.resolver';
+import { PostResolver } from 'src/app/shared/resolvers/post.resolver';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
@@ -29,7 +29,7 @@ import { HttpClientModule } from '@angular/common/http';
     NgbModalModule,
     HttpClientModule
   ],
-  providers: [PermissionsResolver],
+  providers: [PostResolver],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

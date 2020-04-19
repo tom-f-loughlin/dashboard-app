@@ -30,7 +30,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private headerStrategyService: HeaderStrategyService,
-    private authService: AuthService) {
+    private authService: AuthService
+  ) {
 
     this.headerStrategyService.headerStateChange(HeaderState.LOGIN);
 

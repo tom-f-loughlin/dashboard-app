@@ -11,6 +11,8 @@
         border-left: none;
     }
 }
+$caret-color: #17a2b8;
+$caret-hover-color: #007bff;
 
 // TOd make shared assets style folder
 .padded-border {
@@ -39,24 +41,25 @@
     height: 0;
     margin: 0.5rem;
     background-color: transparent;
-    &.disabled {
+    &:disabled {
         opacity: 0.4;
+        filter: grayscale(80%);
     }
 }
 .caret-right {
-    @include arrow-left-right-caret(1rem, black, "true");
+    @include arrow-left-right-caret(1rem, $caret-color, "true");
 
-    &:hover {
+    &.hoverable:hover {
         cursor: pointer;
-        @include arrow-left-right-caret(1rem, teal, "true");
+        @include arrow-left-right-caret(1rem, $caret-hover-color, "true");
     }
 }
 .caret-left {
-    @include arrow-left-right-caret(1rem, black, "");
+    @include arrow-left-right-caret(1rem, $caret-color, "");
 
-    &:hover {
+    &.hoverable:hover {
         cursor: pointer;
-        @include arrow-left-right-caret(1rem, teal, "");
+        @include arrow-left-right-caret(1rem, $caret-hover-color, "");
     }
 }
 
