@@ -3,14 +3,14 @@ import { MOCK_USERS } from 'src/app/pages/home/model/login.mock';
 import { MOCK_POSTS } from 'src/app/pages/posts/model/posts.mocks';
 import { Post } from 'src/app/shared/interfaces/post.interface';
 import { PaginationService } from 'src/app/services/pagination.service';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { map, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
-import { User } from 'src/app/shared/interfaces/user.interface';
+import { UserData } from 'src/app/shared/interfaces/user.interface';
 
 const PAGINATION_LIMIT = 10;
 
 export interface HomeData {
-  user: User;
+  user: UserData;
   post: Post
 }
 
@@ -37,6 +37,7 @@ export class HomeService {
     // we will use tha pagination as the actionable stream as we don't want to do this transformation for everything instance.
     this.homeData$ = this.paginationService.paginatedState$.pipe(
       withLatestFrom(of(chunkedArray)),
+      distinctUntilChanged(),
       map(([paginationState, chunkedArr]) => chunkedArr[paginationState] || []),
       // types inferred no need to define though will for readablity
       map(filteredChunk => this.groupBy<Post>(filteredChunk, 'userId')),
@@ -53,11 +54,11 @@ export class HomeService {
     }, []);
   }
 
-  private transformHomeData(posts: Post[], user: User): HomeData[] {
+  private transformHomeData(posts: Post[], user: UserData): HomeData[] {
     return posts.map((post): HomeData => ({ user, post }));
   }
 
-  private findUserFromGroupPost(users: User[], userPostId: string): User {
+  private findUserFromGroupPost(users: UserData[], userPostId: string): UserData {
     const userPostIdNum = parseInt(userPostId);
     return users.find(user => user.id === userPostIdNum);
   }

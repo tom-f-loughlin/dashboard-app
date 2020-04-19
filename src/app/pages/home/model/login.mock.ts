@@ -1,6 +1,6 @@
-import { User } from 'src/app/shared/interfaces/user.interface';
+import { UserData } from 'src/app/shared/interfaces/user.interface';
 
-export const MOCK_USERS: User[] = [
+export const MOCK_USERS: UserData[] = [
     {
         "id": 1,
         "name": "Leanne Graham",

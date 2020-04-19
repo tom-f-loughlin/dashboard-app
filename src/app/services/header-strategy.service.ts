@@ -23,4 +23,8 @@ export class HeaderStrategyService {
     this.headerStateSubject.next(HeaderState.HOME);
     this.headerState$ = this.headerStateSubject.asObservable();
   }
+
+  headerStateChange(state: HeaderState) {
+    this.headerStateSubject.next(state);
+  }
 }

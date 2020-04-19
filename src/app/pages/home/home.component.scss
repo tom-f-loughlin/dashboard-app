@@ -12,6 +12,7 @@
     }
 }
 
+// TOd make shared assets style folder
 .padded-border {
     padding: 1.5rem;
 }
@@ -46,7 +47,7 @@
 
     &:hover {
         cursor: pointer;
-        @include arrow-left-right-caret(1rem, blue, "true");
+        @include arrow-left-right-caret(1rem, teal, "true");
     }
 }
 .caret-left {
@@ -54,7 +55,7 @@
 
     &:hover {
         cursor: pointer;
-        @include arrow-left-right-caret(1rem, blue, "");
+        @include arrow-left-right-caret(1rem, teal, "");
     }
 
 }

@@ -1,23 +1,31 @@
-<header class="row justify-content-between align-items-center bg-white border-bottom shadow-sm sticky-top">
-    <h3 class="col-md-3 col-sm-6">{{title$ | async}}</h3>
-    <div class="col-md-3 offset-md-6 col-sm-6" [ngSwitch]="title$ | async">
-        <div *ngSwitchCase="headerState.HOME">
-            <div *ngIf="false">
-                <p>Your not logged in</p>
-                <button type="button" class="btn btn-light">Log in</button>
-            </div>
+<header class="justify-content-between bg-white border-bottom shadow-sm sticky-top">
+    <div class="row align-items-center h-100">
+        <h3 class="col-md-3 col-sm-6">{{title$ | async}}</h3>
+        <div class="col-md-4 offset-md-5 col-sm-6" [ngSwitch]="title$ | async">
 
-            <div *ngIf="true">
-                <p>Welcome, Leanne Graham!</p>
-                <button type="button" class="btn btn-light">New post</button>
-                <button type="button" class="btn btn-light">Log out</button>
-            </div>
+            <ng-container *ngSwitchCase="headerState.HOME">
+                <!-- make component -->
+
+                <div class="row align-items-baseline justify-content-around">
+                    <ng-container *ngIf="(user$ | async) as user; else noUser">
+                        <p>Welcome, {{user.name}}!</p>
+                        <button type="button" class="btn btn-outline-info">New post</button>
+                        <a type="button" class="btn btn-outline-info" href="/login">Log out</a>
+                    </ng-container>
+                    <ng-template #noUser>
+                        <p>Your are not logged in</p>
+                        <a type="button" href="/login" class="btn btn-outline-info">Log in</a>
+                    </ng-template>
+                </div>
+            </ng-container>
+
+            <p *ngSwitchCase="headerState.POST_EDIT">
+                Is it me your looking?
+            </p>
+            <p *ngSwitchCase="headerState.POST_NEW">
+                Is it me your looking?
+            </p>
         </div>
-        <p *ngSwitchCase="headerState.POST_EDIT">
-            Is it me your looking?
-        </p>
-        <p *ngSwitchCase="headerState.POST_NEW">
-            Is it me your looking?
-        </p>
     </div>
+
 </header>

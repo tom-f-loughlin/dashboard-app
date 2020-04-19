@@ -1,0 +1,30 @@
+.login {
+    // replace 80px from varibale later
+    height: calc(80vh - 80px);
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 auto;
+}
+.btn-wrap {
+    padding: 1rem 4px;
+    margin-left: auto;
+}
+.has-error {
+    input {
+        border: 1px solid red;
+    }
+}
+
+.info-wrap {
+    height: 80px;
+    .alert-danger {
+        background: none;
+        border: none;
+        color: red;
+    }
+}

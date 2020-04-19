@@ -17,7 +17,7 @@ export interface GeoCode {
     lng: string;
 };
 
-export interface User {
+export interface UserData {
     id: number;
     name: string;
     username: string;

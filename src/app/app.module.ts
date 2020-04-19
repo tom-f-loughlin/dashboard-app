@@ -8,6 +8,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { PostsComponent } from './pages/posts/posts.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PermissionsResolver } from 'src/app/shared/resolvers/permission.resolver';
 
 @NgModule({
   declarations: [
@@ -21,8 +23,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     BrowserModule,
     NgbModule,
     AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [PermissionsResolver],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
